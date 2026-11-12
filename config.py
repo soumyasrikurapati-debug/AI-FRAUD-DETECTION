@@ -8,7 +8,7 @@ class Config:
     """Application and Database Configuration Settings."""
     
     # Flask Security
-    SECRET_KEY = os.getenv('SECRET_KEY', 'apex-bank-fraud-detection-secret-key-2026')
+    SECRET_KEY = os.getenv("SECRET_KEY")
     
     # MySQL Database Connection Settings
     DB_HOST = os.getenv('DB_HOST', 'localhost')
