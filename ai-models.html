@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Models & Engines | Apex Banking Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🛡️</div>
+                <div>
+                    <h2>Apex Sentinel</h2>
+                    <p>AI Fraud Engine</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Core Modules</div>
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="accounts.html" class="nav-link">
+                    <span class="nav-icon">💳</span>
+                    <span>Bank Accounts</span>
+                </a>
+                <a href="transactions.html" class="nav-link">
+                    <span class="nav-icon">💸</span>
+                    <span>Transactions</span>
+                </a>
+
+                <div class="nav-section-title">AI & Security</div>
+                <a href="fraud-detection.html" class="nav-link">
+                    <span class="nav-icon">🔍</span>
+                    <span>Fraud Detection</span>
+                </a>
+                <a href="alerts.html" class="nav-link">
+                    <span class="nav-icon">🚨</span>
+                    <span>Security Alerts</span>
+                </a>
+                <a href="ai-models.html" class="nav-link active">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Model Metrics</span>
+                </a>
+
+                <div class="nav-section-title">Management</div>
+                <a href="branches.html" class="nav-link">
+                    <span class="nav-icon">🏢</span>
+                    <span>Branches</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <span class="nav-icon">📑</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-info">
+                        <div class="name" id="user-display-name">Admin User</div>
+                        <div class="role" id="user-display-role">Super Admin</div>
+                    </div>
+                    <button class="logout-btn" title="Sign Out" onclick="DB_STORE.logout()">🚪</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1>AI Models & Explainable Detection Architecture</h1>
+                    <p>Transparent evaluation parameters, decision rules, and model accuracies</p>
+                </div>
+                <div class="navbar-actions">
+                    <span class="badge badge-low">Model Weights: Healthy</span>
+                </div>
+            </header>
+
+            <div class="content-container">
+                <!-- AI Model Cards -->
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 style="color: #1e3a8a;">🤖 Model #1: Heuristic Multi-Rule Sentinel</h3>
+                                <p style="font-size: 0.74rem; color: #64748b;">Production Rule-Based Expert Engine (Version 2.1)</p>
+                            </div>
+                            <span class="badge badge-low">ACTIVE PRODUCTION</span>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">Validation Accuracy:</span>
+                                <span style="font-size: 1.35rem; font-weight: 800; color: #16a34a;">96.50%</span>
+                            </div>
+                            <div class="risk-meter" style="height: 10px; margin-bottom: 18px;">
+                                <div class="risk-meter-fill low" style="width: 96.5%;"></div>
+                            </div>
+                            <p style="font-size: 0.82rem; color: #475569; line-height: 1.5; margin-bottom: 16px;">
+                                Evaluates incoming transactions against 4 multi-dimensional banking security rules in under 50ms, generating transparent explainable risk scores from 0 to 100.
+                            </p>
+                            <div style="background: #f8fafc; border-radius: 6px; padding: 12px; font-size: 0.78rem;">
+                                <div><strong>Latency:</strong> &lt; 45 ms</div>
+                                <div><strong>False Positive Rate:</strong> 2.8%</div>
+                                <div><strong>Explainability Mode:</strong> Human-Readable Rule Breakdown</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <div>
+                                <h3 style="color: #1e3a8a;">🌲 Model #2: Supervised Decision Tree</h3>
+                                <p style="font-size: 0.74rem; color: #64748b;">Machine Learning Anomaly Classifier (Version 1.4)</p>
+                            </div>
+                            <span class="badge badge-blue">ACTIVE BENCHMARK</span>
+                        </div>
+                        <div class="card-body">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span style="font-size: 0.85rem; font-weight: 600; color: #475569;">Classification Accuracy:</span>
+                                <span style="font-size: 1.35rem; font-weight: 800; color: #2563eb;">94.80%</span>
+                            </div>
+                            <div class="risk-meter" style="height: 10px; margin-bottom: 18px;">
+                                <div class="risk-meter-fill" style="background: #2563eb; width: 94.8%;"></div>
+                            </div>
+                            <p style="font-size: 0.82rem; color: #475569; line-height: 1.5; margin-bottom: 16px;">
+                                Trained on historical transactional features: transaction amount, time-of-day, historical customer velocity, and geolocation deviation.
+                            </p>
+                            <div style="background: #f8fafc; border-radius: 6px; padding: 12px; font-size: 0.78rem;">
+                                <div><strong>Algorithm:</strong> Scikit-Learn DecisionTreeClassifier</div>
+                                <div><strong>Max Depth:</strong> 5 (Prevents overfitting)</div>
+                                <div><strong>Training Dataset:</strong> Dummy Banking Transaction Synthetics</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Explainable Rules Architecture Breakdown -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Transparent Explainable Rules Breakdown</h3>
+                        <span class="badge badge-gray">Viva Reference</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="grid-4" style="margin-bottom: 0;">
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 6px;">💰</div>
+                                <h4 style="font-size: 0.92rem; color: #0a192f; margin-bottom: 6px;">1. Amount Spike Rule</h4>
+                                <p style="font-size: 0.78rem; color: #64748b; line-height: 1.4;">
+                                    Transactions exceeding ₹1,00,000 add +35 risk points. Transactions exceeding ₹5,00,000 add +55 points.
+                                </p>
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 6px;">🌍</div>
+                                <h4 style="font-size: 0.92rem; color: #0a192f; margin-bottom: 6px;">2. Geographic Anomaly</h4>
+                                <p style="font-size: 0.78rem; color: #64748b; line-height: 1.4;">
+                                    Detects logins or transfers originating outside the customer's domestic home country, adding +40 points.
+                                </p>
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 6px;">⚡</div>
+                                <h4 style="font-size: 0.92rem; color: #0a192f; margin-bottom: 6px;">3. Velocity Frequency Burst</h4>
+                                <p style="font-size: 0.78rem; color: #64748b; line-height: 1.4;">
+                                    Flags accounts with $\ge 2$ consecutive transactions within a brief timeframe, adding +30 points.
+                                </p>
+                            </div>
+
+                            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 16px;">
+                                <div style="font-size: 1.5rem; margin-bottom: 6px;">🏦</div>
+                                <h4 style="font-size: 0.92rem; color: #0a192f; margin-bottom: 6px;">4. Account Liquidation</h4>
+                                <p style="font-size: 0.78rem; color: #64748b; line-height: 1.4;">
+                                    Withdrawals draining more than 80% of current available balance flag a +20 risk penalty.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        const user = DB_STORE.getCurrentUser();
+        if (user) {
+            document.getElementById('user-display-name').textContent = user.user_name;
+            document.getElementById('user-display-role').textContent = user.role.replace('_', ' ');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Detection Engine | Apex Banking Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🛡️</div>
+                <div>
+                    <h2>Apex Sentinel</h2>
+                    <p>AI Fraud Engine</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Core Modules</div>
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="accounts.html" class="nav-link">
+                    <span class="nav-icon">💳</span>
+                    <span>Bank Accounts</span>
+                </a>
+                <a href="transactions.html" class="nav-link">
+                    <span class="nav-icon">💸</span>
+                    <span>Transactions</span>
+                </a>
+
+                <div class="nav-section-title">AI & Security</div>
+                <a href="fraud-detection.html" class="nav-link active">
+                    <span class="nav-icon">🔍</span>
+                    <span>Fraud Detection</span>
+                </a>
+                <a href="alerts.html" class="nav-link">
+                    <span class="nav-icon">🚨</span>
+                    <span>Security Alerts</span>
+                </a>
+                <a href="ai-models.html" class="nav-link">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Model Metrics</span>
+                </a>
+
+                <div class="nav-section-title">Management</div>
+                <a href="branches.html" class="nav-link">
+                    <span class="nav-icon">🏢</span>
+                    <span>Branches</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <span class="nav-icon">📑</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-info">
+                        <div class="name" id="user-display-name">Admin User</div>
+                        <div class="role" id="user-display-role">Super Admin</div>
+                    </div>
+                    <button class="logout-btn" title="Sign Out" onclick="DB_STORE.logout()">🚪</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1>Fraud Detection & Risk Scoring</h1>
+                    <p>Explainable AI evaluations, anomalous pattern indicators, and fraud status triage</p>
+                </div>
+                <div class="navbar-actions">
+                    <span class="badge badge-high" style="font-size: 0.8rem; padding: 6px 12px;">
+                        Sentinel Engine: Multi-Factor Rule v2.1
+                    </span>
+                </div>
+            </header>
+
+            <div class="content-container">
+                <!-- Toolbar: Filter -->
+                <div class="toolbar-bar">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="fraud-search" placeholder="Search by reason, fraud type, or transaction ID..." oninput="filterFraudRecords()">
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select id="risk-filter" class="filter-select" onchange="filterFraudRecords()">
+                            <option value="ALL">All Risk Levels</option>
+                            <option value="HIGH">High Risk (70 - 100)</option>
+                            <option value="MEDIUM">Medium Risk (40 - 69)</option>
+                            <option value="LOW">Low Risk (0 - 39)</option>
+                        </select>
+                        <select id="status-filter" class="filter-select" onchange="filterFraudRecords()">
+                            <option value="ALL">All Decision Statuses</option>
+                            <option value="SUSPECTED">SUSPECTED</option>
+                            <option value="CONFIRMED_FRAUD">CONFIRMED FRAUD</option>
+                            <option value="UNDER_REVIEW">UNDER REVIEW</option>
+                            <option value="RESOLVED">RESOLVED</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Fraud Records Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>AI Scored Transactions (<span id="fraud-count">0</span> Evaluated)</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fraud ID</th>
+                                    <th>Tx Ref</th>
+                                    <th>Risk Score (0-100)</th>
+                                    <th>Risk Level</th>
+                                    <th>Explainable Reasons & Rules Triggered</th>
+                                    <th>Evaluated Date</th>
+                                    <th>Triage Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fraud-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Triage Status Modal -->
+    <div class="modal-overlay" id="status-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Update Fraud Investigation Status</h4>
+                <button class="modal-close" onclick="closeStatusModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="selected-fraud-id">
+                <p style="font-size: 0.84rem; color: #475569; margin-bottom: 16px;">
+                    Change the analytical outcome for this transaction after manual investigation:
+                </p>
+                <div class="form-group">
+                    <label for="new-fraud-status">Decision Status</label>
+                    <select id="new-fraud-status" class="form-control">
+                        <option value="SUSPECTED">SUSPECTED (Active monitoring)</option>
+                        <option value="CONFIRMED_FRAUD">CONFIRMED FRAUD (Block & Freeze Account)</option>
+                        <option value="FALSE_POSITIVE">FALSE POSITIVE (Verified Legitimate)</option>
+                        <option value="RESOLVED">RESOLVED (Closed)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeStatusModal()">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveFraudStatus()">Update Decision</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        let allFraudRecords = [];
+
+        function renderFraudRecords(list) {
+            const tbody = document.getElementById('fraud-tbody');
+            document.getElementById('fraud-count').textContent = list.length;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 32px; color: #94a3b8;">No matching fraud evaluations found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(f => `
+                <tr>
+                    <td style="font-weight: 700; color: #2563eb;">#${f.fraud_id}</td>
+                    <td>
+                        <a href="transactions.html" style="font-weight: 700; text-decoration: none; color: #0f172a;">Tx #${f.transaction_id}</a>
+                    </td>
+                    <td style="min-width: 130px;">
+                        <div style="font-weight: 800; font-size: 1.05rem; color: ${f.risk_level === 'HIGH' ? '#dc2626' : (f.risk_level === 'MEDIUM' ? '#d97706' : '#16a34a')};">
+                            ${f.fraud_score} <span style="font-size: 0.72rem; color: #94a3b8;">/ 100</span>
+                        </div>
+                        <div class="risk-meter">
+                            <div class="risk-meter-fill ${f.risk_level.toLowerCase()}" style="width: ${f.fraud_score}%;"></div>
+                        </div>
+                    </td>
+                    <td>${UI.formatRiskBadge(f.risk_level)}</td>
+                    <td style="max-width: 320px; font-size: 0.8rem; color: #334155; line-height: 1.4;">
+                        <strong>[${f.fraud_type.replace(/_/g, ' ')}]</strong> ${f.reasons || 'Threshold check passed.'}
+                    </td>
+                    <td style="font-size: 0.76rem; color: #64748b; white-space: nowrap;">${f.detection_date}</td>
+                    <td>
+                        ${f.fraud_status === 'CONFIRMED_FRAUD' ? '<span class="badge badge-high">CONFIRMED FRAUD</span>' : 
+                         (f.fraud_status === 'SUSPECTED' ? '<span class="badge badge-high">SUSPECTED</span>' : 
+                         (f.fraud_status === 'UNDER_REVIEW' ? '<span class="badge badge-medium">UNDER REVIEW</span>' : '<span class="badge badge-low">RESOLVED</span>'))}
+                    </td>
+                    <td>
+                        <button class="btn btn-outline btn-sm" onclick="openStatusModal(${f.fraud_id}, '${f.fraud_status}')">
+                            Update
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadFraudRecords() {
+            allFraudRecords = DB_STORE.getFraudRecords();
+            filterFraudRecords();
+        }
+
+        function filterFraudRecords() {
+            const query = document.getElementById('fraud-search').value.toLowerCase().trim();
+            const risk = document.getElementById('risk-filter').value;
+            const status = document.getElementById('status-filter').value;
+
+            const filtered = allFraudRecords.filter(f => {
+                const matchesQuery = (f.fraud_type || '').toLowerCase().includes(query) || 
+                                     (f.reasons || '').toLowerCase().includes(query) || 
+                                     f.transaction_id.toString().includes(query);
+                const matchesRisk = (risk === 'ALL') || (f.risk_level === risk);
+                const matchesStatus = (status === 'ALL') || (f.fraud_status === status);
+                return matchesQuery && matchesRisk && matchesStatus;
+            });
+
+            renderFraudRecords(filtered);
+        }
+
+        function openStatusModal(fraudId, currentStatus) {
+            document.getElementById('selected-fraud-id').value = fraudId;
+            document.getElementById('new-fraud-status').value = currentStatus;
+            document.getElementById('status-modal').classList.add('active');
+        }
+
+        function closeStatusModal() {
+            document.getElementById('status-modal').classList.remove('active');
+        }
+
+        function saveFraudStatus() {
+            const fraudId = document.getElementById('selected-fraud-id').value;
+            const newStatus = document.getElementById('new-fraud-status').value;
+
+            DB_STORE.updateFraudStatus(fraudId, newStatus);
+            UI.showToast(`Fraud incident #${fraudId} status updated to ${newStatus}.`, 'success');
+            closeStatusModal();
+            loadFraudRecords();
+        }
+
+        loadFraudRecords();
+    </script>
+</body>
+</html>

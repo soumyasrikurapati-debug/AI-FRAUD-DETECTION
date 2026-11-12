@@ -1,0 +1,9 @@
+# Python Dependencies for AI Fraud Detection System
+Flask==3.0.3
+PyMySQL==1.1.1
+cryptography==42.0.8
+scikit-learn==1.4.2
+pandas==2.2.2
+numpy==1.26.4
+joblib==1.4.2
+python-dotenv==1.0.1

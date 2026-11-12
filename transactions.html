@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Management | Apex Banking Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🛡️</div>
+                <div>
+                    <h2>Apex Sentinel</h2>
+                    <p>AI Fraud Engine</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Core Modules</div>
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="accounts.html" class="nav-link">
+                    <span class="nav-icon">💳</span>
+                    <span>Bank Accounts</span>
+                </a>
+                <a href="transactions.html" class="nav-link active">
+                    <span class="nav-icon">💸</span>
+                    <span>Transactions</span>
+                </a>
+
+                <div class="nav-section-title">AI & Security</div>
+                <a href="fraud-detection.html" class="nav-link">
+                    <span class="nav-icon">🔍</span>
+                    <span>Fraud Detection</span>
+                </a>
+                <a href="alerts.html" class="nav-link">
+                    <span class="nav-icon">🚨</span>
+                    <span>Security Alerts</span>
+                </a>
+                <a href="ai-models.html" class="nav-link">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Model Metrics</span>
+                </a>
+
+                <div class="nav-section-title">Management</div>
+                <a href="branches.html" class="nav-link">
+                    <span class="nav-icon">🏢</span>
+                    <span>Branches</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <span class="nav-icon">📑</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-info">
+                        <div class="name" id="user-display-name">Admin User</div>
+                        <div class="role" id="user-display-role">Super Admin</div>
+                    </div>
+                    <button class="logout-btn" title="Sign Out" onclick="DB_STORE.logout()">🚪</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1>Transaction Management</h1>
+                    <p>Execute financial transactions with real-time explainable AI fraud evaluation</p>
+                </div>
+                <div class="navbar-actions">
+                    <button class="btn btn-primary" onclick="openTxModal()">
+                        + New Transaction
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-container">
+                <!-- Simulation Quick Action Banner -->
+                <div class="card" style="background: linear-gradient(135deg, #eff6ff, #f0fdf4); border-color: #bfdbfe; margin-bottom: 24px;">
+                    <div class="card-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                        <div>
+                            <h4 style="color: #1e3a8a; margin-bottom: 4px;">⚡ Instant Demo Scenarios (One-Click Viva Testing)</h4>
+                            <p style="font-size: 0.82rem; color: #475569;">
+                                Test how the AI engine assesses safe transactions versus malicious fraud patterns in real-time.
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" onclick="simulateScenario('NORMAL')">
+                                ✅ Normal Deposit (₹15,000)
+                            </button>
+                            <button class="btn btn-danger" onclick="simulateScenario('ATTACK')">
+                                🚨 Trigger Fraud Spike (₹8,90,000 / Moscow)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Toolbar: Search and Filter -->
+                <div class="toolbar-bar">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="tx-search" placeholder="Search by account number, location, or customer..." oninput="filterTransactions()">
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select id="type-filter" class="filter-select" onchange="filterTransactions()">
+                            <option value="ALL">All Types</option>
+                            <option value="DEPOSIT">DEPOSIT</option>
+                            <option value="WITHDRAWAL">WITHDRAWAL</option>
+                            <option value="TRANSFER">TRANSFER</option>
+                        </select>
+                        <select id="status-filter" class="filter-select" onchange="filterTransactions()">
+                            <option value="ALL">All Statuses</option>
+                            <option value="SUCCESS">SUCCESS</option>
+                            <option value="FLAGGED">FLAGGED (High Risk)</option>
+                            <option value="PENDING">PENDING</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Transaction Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Financial Transactions Log (<span id="tx-count">0</span> Records)</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Account / Customer</th>
+                                    <th>Type</th>
+                                    <th>Amount (₹)</th>
+                                    <th>Date & Time</th>
+                                    <th>Origin Location</th>
+                                    <th>AI Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- New Transaction Modal -->
+    <div class="modal-overlay" id="tx-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Initiate Financial Transaction</h4>
+                <button class="modal-close" onclick="closeTxModal()">✕</button>
+            </div>
+            <form id="tx-form" onsubmit="processTransaction(event)">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="tx-account-id">Select Bank Account *</label>
+                        <select id="tx-account-id" class="form-control" required onchange="updateAccountBalanceDisplay()">
+                            <!-- Populated with accounts -->
+                        </select>
+                        <div id="balance-hint" style="font-size: 0.76rem; color: #1e40af; margin-top: 4px; font-weight: 600;"></div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tx-type">Transaction Type *</label>
+                            <select id="tx-type" class="form-control" required>
+                                <option value="TRANSFER">TRANSFER</option>
+                                <option value="DEPOSIT">DEPOSIT</option>
+                                <option value="WITHDRAWAL">WITHDRAWAL</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tx-amount">Amount (₹) *</label>
+                            <input type="number" id="tx-amount" class="form-control" min="1" step="1" placeholder="e.g. 50000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tx-location">Terminal / City Location *</label>
+                            <input type="text" id="tx-location" class="form-control" placeholder="e.g. Mumbai, New Delhi, London" required value="Mumbai">
+                        </div>
+                        <div class="form-group">
+                            <label for="tx-branch-id">Processing Branch</label>
+                            <select id="tx-branch-id" class="form-control">
+                                <!-- Populated with branches -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 10px 14px; font-size: 0.78rem; color: #64748b;">
+                        ℹ️ <strong>Fraud Engine Active:</strong> Transactions over ₹1,00,000, rapid succession, or foreign IP locations will trigger automated risk scoring and alerts.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeTxModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submit-tx-btn">Execute & Analyze</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- AI Evaluation Result Modal -->
+    <div class="modal-overlay" id="eval-modal">
+        <div class="modal-content">
+            <div class="modal-header" style="background: #0f172a; color: white;">
+                <h4 style="color: white;">AI Sentinel Fraud Evaluation Report</h4>
+                <button class="modal-close" style="color: white;" onclick="closeEvalModal()">✕</button>
+            </div>
+            <div class="modal-body" id="eval-modal-body">
+                <!-- Injected after transaction is scored -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeEvalModal()">Acknowledge & Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        let allTransactions = [];
+
+        function renderTransactions(list) {
+            const tbody = document.getElementById('transactions-tbody');
+            document.getElementById('tx-count').textContent = list.length;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 32px; color: #94a3b8;">No matching transactions found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(t => `
+                <tr>
+                    <td style="font-weight: 700; color: #2563eb;">#${t.transaction_id}</td>
+                    <td>
+                        <div style="font-weight: 700; color: #0a192f;">${t.customer_name}</div>
+                        <div style="font-family: monospace; font-size: 0.75rem; color: #64748b;">${t.account_number}</div>
+                    </td>
+                    <td><span class="badge badge-blue">${t.transaction_type}</span></td>
+                    <td style="font-weight: 800; font-size: 0.95rem; color: ${t.transaction_type === 'DEPOSIT' ? '#16a34a' : '#0a192f'};">
+                        ${t.transaction_type === 'DEPOSIT' ? '+' : '-'}${UI.formatCurrency(t.amount)}
+                    </td>
+                    <td style="font-size: 0.8rem;">
+                        <div>${t.transaction_date}</div>
+                        <div style="color: #64748b; font-size: 0.72rem;">${t.transaction_time}</div>
+                    </td>
+                    <td style="font-size: 0.82rem; font-weight: 600;">
+                        ${t.location.includes('Russia') || t.location.includes('Nigeria') ? '🚩 ' + t.location : '📍 ' + t.location}
+                    </td>
+                    <td>
+                        ${t.transaction_status === 'FLAGGED' ? '<span class="badge badge-high">⚠️ Flagged</span>' : 
+                         (t.transaction_status === 'PENDING' ? '<span class="badge badge-medium">Pending Review</span>' : '<span class="badge badge-low">Approved</span>')}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline btn-sm" onclick="viewFraudDetail(${t.transaction_id})" title="View Risk Analysis">🔍 AI Analysis</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteTx(${t.transaction_id})" title="Delete">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadTransactions() {
+            allTransactions = DB_STORE.getTransactions();
+            filterTransactions();
+            populateModalDropdowns();
+        }
+
+        function populateModalDropdowns() {
+            const accounts = DB_STORE.getAccounts();
+            const accSelect = document.getElementById('tx-account-id');
+            accSelect.innerHTML = accounts.map(a => `
+                <option value="${a.account_id}" data-balance="${a.balance}">
+                    ${a.account_number} - ${a.customer_name} (${a.account_type} | Bal: ₹${a.balance.toLocaleString()})
+                </option>
+            `).join('');
+            updateAccountBalanceDisplay();
+
+            const branches = DB_STORE.getBranches();
+            const branchSelect = document.getElementById('tx-branch-id');
+            branchSelect.innerHTML = branches.map(b => `
+                <option value="${b.branch_id}">${b.branch_name} (${b.city})</option>
+            `).join('');
+        }
+
+        function updateAccountBalanceDisplay() {
+            const select = document.getElementById('tx-account-id');
+            const selectedOpt = select.options[select.selectedIndex];
+            if (selectedOpt) {
+                const balance = selectedOpt.getAttribute('data-balance');
+                document.getElementById('balance-hint').textContent = `Current Available Balance: ₹${parseFloat(balance).toLocaleString()}`;
+            }
+        }
+
+        function filterTransactions() {
+            const query = document.getElementById('tx-search').value.toLowerCase().trim();
+            const type = document.getElementById('type-filter').value;
+            const status = document.getElementById('status-filter').value;
+
+            const filtered = allTransactions.filter(t => {
+                const matchesQuery = t.account_number.toLowerCase().includes(query) || 
+                                     t.customer_name.toLowerCase().includes(query) || 
+                                     t.location.toLowerCase().includes(query);
+                const matchesType = (type === 'ALL') || (t.transaction_type === type);
+                const matchesStatus = (status === 'ALL') || (t.transaction_status === status);
+                return matchesQuery && matchesType && matchesStatus;
+            });
+
+            renderTransactions(filtered);
+        }
+
+        function openTxModal() {
+            document.getElementById('tx-modal').classList.add('active');
+            populateModalDropdowns();
+        }
+
+        function closeTxModal() {
+            document.getElementById('tx-modal').classList.remove('active');
+            document.getElementById('tx-form').reset();
+        }
+
+        function closeEvalModal() {
+            document.getElementById('eval-modal').classList.remove('active');
+        }
+
+        function processTransaction(e) {
+            e.preventDefault();
+
+            const txData = {
+                account_id: document.getElementById('tx-account-id').value,
+                transaction_type: document.getElementById('tx-type').value,
+                amount: document.getElementById('tx-amount').value,
+                location: document.getElementById('tx-location').value.trim(),
+                branch_id: document.getElementById('tx-branch-id').value
+            };
+
+            try {
+                const result = DB_STORE.addTransaction(txData);
+                closeTxModal();
+                loadTransactions();
+
+                // Display evaluation modal with transparent explainable AI details
+                showEvaluationReport(result);
+            } catch (err) {
+                UI.showToast(err.message, 'error');
+            }
+        }
+
+        function showEvaluationReport(result) {
+            const evalModal = document.getElementById('eval-modal');
+            const body = document.getElementById('eval-modal-body');
+            const f = result.fraud;
+            const evalRes = result.evaluation;
+
+            const isHigh = evalRes.risk_level === 'HIGH';
+            const isMed = evalRes.risk_level === 'MEDIUM';
+
+            body.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="font-size: 2.4rem; font-weight: 800; color: ${isHigh ? '#dc2626' : (isMed ? '#d97706' : '#16a34a')};">
+                        ${evalRes.fraud_score} / 100
+                    </div>
+                    <div style="margin-top: 4px;">
+                        ${evalRes.risk_level === 'HIGH' ? '<span class="badge badge-high">High Fraud Risk</span>' : 
+                         (evalRes.risk_level === 'MEDIUM' ? '<span class="badge badge-medium">Medium Risk</span>' : '<span class="badge badge-low">Low Risk - Legitimate</span>')}
+                    </div>
+                </div>
+
+                <div class="risk-meter" style="height: 10px; margin-bottom: 20px;">
+                    <div class="risk-meter-fill ${evalRes.risk_level.toLowerCase()}" style="width: ${evalRes.fraud_score}%;"></div>
+                </div>
+
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+                    <h5 style="color: #0f172a; margin-bottom: 6px; font-size: 0.88rem;">💡 Explainable AI Decision Factor:</h5>
+                    <p style="font-size: 0.82rem; color: #475569; line-height: 1.5;">${evalRes.reasons}</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.82rem;">
+                    <div><strong>Transaction ID:</strong> #${result.transaction.transaction_id}</div>
+                    <div><strong>Amount:</strong> ₹${parseFloat(result.transaction.amount).toLocaleString()}</div>
+                    <div><strong>Origin Location:</strong> ${result.transaction.location}</div>
+                    <div><strong>Assigned Status:</strong> ${result.transaction.transaction_status}</div>
+                </div>
+
+                ${isHigh ? `
+                    <div style="margin-top: 16px; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; color: #b91c1c; font-size: 0.78rem;">
+                        🚨 <strong>Security Action:</strong> High-priority security alert has been dispatched to Fraud Analyst inbox. Account balance was kept safe.
+                    </div>
+                ` : ''}
+            `;
+
+            evalModal.classList.add('active');
+        }
+
+        function viewFraudDetail(txId) {
+            const frauds = DB_STORE.getFraudRecords();
+            const txs = DB_STORE.getTransactions();
+            const fraud = frauds.find(f => f.transaction_id === txId);
+            const tx = txs.find(t => t.transaction_id === txId);
+
+            if (!fraud || !tx) {
+                UI.showToast('No fraud record found for this transaction.', 'warning');
+                return;
+            }
+
+            showEvaluationReport({
+                transaction: tx,
+                fraud: fraud,
+                evaluation: {
+                    fraud_score: fraud.fraud_score,
+                    risk_level: fraud.risk_level,
+                    reasons: fraud.reasons || 'Historical transaction evaluation record.'
+                }
+            });
+        }
+
+        function simulateScenario(scenario) {
+            const accounts = DB_STORE.getAccounts();
+            if (!accounts.length) return;
+
+            if (scenario === 'NORMAL') {
+                document.getElementById('tx-amount').value = '15000';
+                document.getElementById('tx-location').value = 'Mumbai';
+                document.getElementById('tx-type').value = 'DEPOSIT';
+                openTxModal();
+                UI.showToast('Pre-filled standard legitimate transaction!', 'info');
+            } else if (scenario === 'ATTACK') {
+                document.getElementById('tx-amount').value = '890000';
+                document.getElementById('tx-location').value = 'Moscow, Russia';
+                document.getElementById('tx-type').value = 'TRANSFER';
+                openTxModal();
+                UI.showToast('Pre-filled suspicious high-value foreign attack pattern!', 'warning');
+            }
+        }
+
+        function deleteTx(id) {
+            if (confirm('Delete this transaction record?')) {
+                DB_STORE.deleteTransaction(id);
+                UI.showToast('Transaction removed.', 'info');
+                loadTransactions();
+            }
+        }
+
+        // Check URL params for direct action
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('action') === 'new') {
+            setTimeout(openTxModal, 300);
+        }
+
+        loadTransactions();
+    </script>
+</body>
+</html>

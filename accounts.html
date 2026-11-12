@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Management | Apex Banking Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🛡️</div>
+                <div>
+                    <h2>Apex Sentinel</h2>
+                    <p>AI Fraud Engine</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Core Modules</div>
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="accounts.html" class="nav-link active">
+                    <span class="nav-icon">💳</span>
+                    <span>Bank Accounts</span>
+                </a>
+                <a href="transactions.html" class="nav-link">
+                    <span class="nav-icon">💸</span>
+                    <span>Transactions</span>
+                </a>
+
+                <div class="nav-section-title">AI & Security</div>
+                <a href="fraud-detection.html" class="nav-link">
+                    <span class="nav-icon">🔍</span>
+                    <span>Fraud Detection</span>
+                </a>
+                <a href="alerts.html" class="nav-link">
+                    <span class="nav-icon">🚨</span>
+                    <span>Security Alerts</span>
+                </a>
+                <a href="ai-models.html" class="nav-link">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Model Metrics</span>
+                </a>
+
+                <div class="nav-section-title">Management</div>
+                <a href="branches.html" class="nav-link">
+                    <span class="nav-icon">🏢</span>
+                    <span>Branches</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <span class="nav-icon">📑</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-info">
+                        <div class="name" id="user-display-name">Admin User</div>
+                        <div class="role" id="user-display-role">Super Admin</div>
+                    </div>
+                    <button class="logout-btn" title="Sign Out" onclick="DB_STORE.logout()">🚪</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1>Account Management</h1>
+                    <p>Monitor customer balances, account lifecycle statuses, and open new accounts</p>
+                </div>
+                <div class="navbar-actions">
+                    <button class="btn btn-primary" onclick="openAccountModal()">
+                        + Open New Account
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-container">
+                <!-- Toolbar: Search and Filter -->
+                <div class="toolbar-bar">
+                    <div class="search-input-wrapper">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="account-search" placeholder="Search by account number or customer name..." oninput="filterAccounts()">
+                    </div>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select id="type-filter" class="filter-select" onchange="filterAccounts()">
+                            <option value="ALL">All Account Types</option>
+                            <option value="SAVINGS">Savings Account</option>
+                            <option value="CURRENT">Current Account</option>
+                            <option value="FIXED_DEPOSIT">Fixed Deposit</option>
+                        </select>
+                        <select id="status-filter" class="filter-select" onchange="filterAccounts()">
+                            <option value="ALL">All Statuses</option>
+                            <option value="ACTIVE">ACTIVE</option>
+                            <option value="FROZEN">FROZEN</option>
+                            <option value="DORMANT">DORMANT</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Account Table Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Bank Accounts Registry (<span id="account-count">0</span> Active Accounts)</h3>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Account Number</th>
+                                    <th>Customer Owner</th>
+                                    <th>Type</th>
+                                    <th>Available Balance</th>
+                                    <th>Account Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="accounts-tbody">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Account Modal (Open New Account / Edit) -->
+    <div class="modal-overlay" id="account-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="account-modal-title">Open New Bank Account</h4>
+                <button class="modal-close" onclick="closeAccountModal()">✕</button>
+            </div>
+            <form id="account-form" onsubmit="saveAccount(event)">
+                <div class="modal-body">
+                    <input type="hidden" id="edit-account-id">
+
+                    <div class="form-group">
+                        <label for="acc-customer-id">Select Customer Owner *</label>
+                        <select id="acc-customer-id" class="form-control" required>
+                            <!-- Populated with customer list -->
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="acc-type">Account Type *</label>
+                            <select id="acc-type" class="form-control" required>
+                                <option value="SAVINGS">SAVINGS</option>
+                                <option value="CURRENT">CURRENT</option>
+                                <option value="FIXED_DEPOSIT">FIXED DEPOSIT</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="acc-balance">Initial Deposit (₹) *</label>
+                            <input type="number" id="acc-balance" class="form-control" min="0" step="100" placeholder="e.g. 50000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="acc-status">Account Operational Status</label>
+                        <select id="acc-status" class="form-control">
+                            <option value="ACTIVE" selected>ACTIVE</option>
+                            <option value="FROZEN">FROZEN (Security Hold)</option>
+                            <option value="DORMANT">DORMANT</option>
+                            <option value="CLOSED">CLOSED</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeAccountModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        let allAccounts = [];
+
+        function renderAccounts(list) {
+            const tbody = document.getElementById('accounts-tbody');
+            document.getElementById('account-count').textContent = list.length;
+
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 32px; color: #94a3b8;">No matching account records found.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = list.map(a => `
+                <tr>
+                    <td style="font-weight: 700; color: #2563eb;">#${a.account_id}</td>
+                    <td>
+                        <div style="font-family: monospace; font-size: 0.95rem; font-weight: 700; color: #0a192f;">${a.account_number}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 600;">${a.customer_name}</div>
+                        <div style="font-size: 0.74rem; color: #64748b;">Customer ID: #${a.customer_id}</div>
+                    </td>
+                    <td><span class="badge badge-blue">${a.account_type}</span></td>
+                    <td style="font-weight: 800; color: #0a192f; font-size: 0.95rem;">
+                        ${UI.formatCurrency(a.balance)}
+                    </td>
+                    <td>
+                        ${a.account_status === 'ACTIVE' ? '<span class="badge badge-low">Active</span>' : 
+                         (a.account_status === 'FROZEN' ? '<span class="badge badge-high">Frozen</span>' : '<span class="badge badge-gray">' + a.account_status + '</span>')}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline btn-sm" onclick="toggleFreeze(${a.account_id}, '${a.account_status}')" title="Toggle Freeze">
+                                ${a.account_status === 'FROZEN' ? '🔓 Unfreeze' : '❄️ Freeze'}
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteAccount(${a.account_id})" title="Delete Account">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadAccounts() {
+            allAccounts = DB_STORE.getAccounts();
+            filterAccounts();
+            populateCustomerSelect();
+        }
+
+        function populateCustomerSelect() {
+            const customers = DB_STORE.getCustomers();
+            const select = document.getElementById('acc-customer-id');
+            select.innerHTML = customers.map(c => `<option value="${c.customer_id}">${c.name} (${c.email})</option>`).join('');
+        }
+
+        function filterAccounts() {
+            const query = document.getElementById('account-search').value.toLowerCase().trim();
+            const type = document.getElementById('type-filter').value;
+            const status = document.getElementById('status-filter').value;
+
+            const filtered = allAccounts.filter(a => {
+                const matchesQuery = a.account_number.toLowerCase().includes(query) || 
+                                     a.customer_name.toLowerCase().includes(query);
+                const matchesType = (type === 'ALL') || (a.account_type === type);
+                const matchesStatus = (status === 'ALL') || (a.account_status === status);
+                return matchesQuery && matchesType && matchesStatus;
+            });
+
+            renderAccounts(filtered);
+        }
+
+        function openAccountModal() {
+            document.getElementById('account-modal').classList.add('active');
+        }
+
+        function closeAccountModal() {
+            document.getElementById('account-modal').classList.remove('active');
+            document.getElementById('account-form').reset();
+            document.getElementById('edit-account-id').value = '';
+        }
+
+        function saveAccount(e) {
+            e.preventDefault();
+            const accountData = {
+                customer_id: document.getElementById('acc-customer-id').value,
+                account_type: document.getElementById('acc-type').value,
+                balance: parseFloat(document.getElementById('acc-balance').value),
+                account_status: document.getElementById('acc-status').value
+            };
+
+            DB_STORE.addAccount(accountData);
+            UI.showToast('New bank account opened successfully!', 'success');
+            closeAccountModal();
+            loadAccounts();
+        }
+
+        function toggleFreeze(id, currentStatus) {
+            const newStatus = currentStatus === 'FROZEN' ? 'ACTIVE' : 'FROZEN';
+            DB_STORE.updateAccount(id, { account_status: newStatus });
+            UI.showToast(`Account status updated to ${newStatus}.`, newStatus === 'FROZEN' ? 'warning' : 'success');
+            loadAccounts();
+        }
+
+        function deleteAccount(id) {
+            if (confirm('Are you sure you want to close and delete this account?')) {
+                DB_STORE.deleteAccount(id);
+                UI.showToast('Account deleted.', 'info');
+                loadAccounts();
+            }
+        }
+
+        // Initialize page
+        loadAccounts();
+    </script>
+</body>
+</html>

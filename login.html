@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Sign In | Apex Financial Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+</head>
+<body style="display: block;">
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            <!-- Header -->
+            <div class="login-header">
+                <div class="logo-badge">🛡️</div>
+                <h2>Apex Banking Portal</h2>
+                <p>AI-Based Fraud Detection & Transaction Management</p>
+            </div>
+
+            <!-- Body -->
+            <div class="login-body">
+                <!-- Demo Quick Fill Box -->
+                <div class="demo-account-box">
+                    <p>💡 Quick College Demo Logins (Click to Auto-Fill):</p>
+                    <div class="demo-pills">
+                        <button type="button" class="demo-pill" onclick="fillCredentials('admin', 'admin123')">
+                            Super Admin (admin)
+                        </button>
+                        <button type="button" class="demo-pill" onclick="fillCredentials('analyst1', 'analyst123')">
+                            Fraud Analyst (analyst1)
+                        </button>
+                    </div>
+                </div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">Username / System ID</label>
+                        <input type="text" id="username" class="form-control" placeholder="Enter username" required value="admin">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Security Password</label>
+                        <input type="password" id="password" class="form-control" placeholder="Enter password" required value="admin123">
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-size: 0.8rem;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; color: #475569;">
+                            <input type="checkbox" checked> Remember this device
+                        </label>
+                        <span style="color: #2563eb; font-weight: 600;">Secure 256-bit AES</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 0.95rem;">
+                        Sign In to Secure Console →
+                    </button>
+                </form>
+
+                <div style="margin-top: 20px; text-align: center;">
+                    <a href="index.html" style="font-size: 0.82rem; color: #64748b; text-decoration: none;">
+                        ← Back to Public Home Page
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        function fillCredentials(user, pass) {
+            document.getElementById('username').value = user;
+            document.getElementById('password').value = pass;
+            UI.showToast(`Auto-filled ${user} credentials!`, 'info');
+        }
+
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            const result = DB_STORE.login(username, password);
+            if (result.success) {
+                UI.showToast('Login successful! Redirecting to Dashboard...', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 600);
+            } else {
+                UI.showToast(result.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>

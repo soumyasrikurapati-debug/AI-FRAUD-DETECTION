@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Analytics | Apex Banking Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🛡️</div>
+                <div>
+                    <h2>Apex Sentinel</h2>
+                    <p>AI Fraud Engine</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Core Modules</div>
+                <a href="dashboard.html" class="nav-link">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="accounts.html" class="nav-link">
+                    <span class="nav-icon">💳</span>
+                    <span>Bank Accounts</span>
+                </a>
+                <a href="transactions.html" class="nav-link">
+                    <span class="nav-icon">💸</span>
+                    <span>Transactions</span>
+                </a>
+
+                <div class="nav-section-title">AI & Security</div>
+                <a href="fraud-detection.html" class="nav-link">
+                    <span class="nav-icon">🔍</span>
+                    <span>Fraud Detection</span>
+                </a>
+                <a href="alerts.html" class="nav-link">
+                    <span class="nav-icon">🚨</span>
+                    <span>Security Alerts</span>
+                </a>
+                <a href="ai-models.html" class="nav-link">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Model Metrics</span>
+                </a>
+
+                <div class="nav-section-title">Management</div>
+                <a href="branches.html" class="nav-link">
+                    <span class="nav-icon">🏢</span>
+                    <span>Branches</span>
+                </a>
+                <a href="reports.html" class="nav-link active">
+                    <span class="nav-icon">📑</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-info">
+                        <div class="name" id="user-display-name">Admin User</div>
+                        <div class="role" id="user-display-role">Super Admin</div>
+                    </div>
+                    <button class="logout-btn" title="Sign Out" onclick="DB_STORE.logout()">🚪</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1>Executive Reports & Financial Audit</h1>
+                    <p>Compliance, risk exposure metrics, and fraud prevention auditing</p>
+                </div>
+                <div class="navbar-actions">
+                    <button class="btn btn-outline" onclick="exportCSV()">
+                        📥 Export CSV
+                    </button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        🖨️ Print Audit Report
+                    </button>
+                </div>
+            </header>
+
+            <div class="content-container">
+                <!-- Summary KPI Row -->
+                <div class="grid-4">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">Total Processed Volume</div>
+                            <div class="stat-value" id="rep-total-volume">₹0</div>
+                            <div class="stat-sub">Across All Customer Accounts</div>
+                        </div>
+                        <div class="stat-icon blue">💰</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">Fraud Prevented / Held</div>
+                            <div class="stat-value" id="rep-prevented-val" style="color: #dc2626;">₹0</div>
+                            <div class="stat-sub">Blocked by High-Risk Flags</div>
+                        </div>
+                        <div class="stat-icon red">🛡️</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">KYC Compliance Rate</div>
+                            <div class="stat-value" id="rep-kyc-rate" style="color: #16a34a;">0%</div>
+                            <div class="stat-sub">Verified Customer Ratio</div>
+                        </div>
+                        <div class="stat-icon green">✅</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">Total Security Incidents</div>
+                            <div class="stat-value" id="rep-alerts-total" style="color: #d97706;">0</div>
+                            <div class="stat-sub">Alerts Triaged by Analysts</div>
+                        </div>
+                        <div class="stat-icon amber">🚨</div>
+                    </div>
+                </div>
+
+                <!-- Printable Audit Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h3>Executive Risk Audit & Transaction Log</h3>
+                            <p style="font-size: 0.74rem; color: #64748b;">Generated on: <span id="report-timestamp"></span></p>
+                        </div>
+                        <span class="badge badge-blue">Official Bank Audit</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tx Ref</th>
+                                        <th>Account</th>
+                                        <th>Customer</th>
+                                        <th>Type</th>
+                                        <th>Amount (₹)</th>
+                                        <th>Origin City</th>
+                                        <th>AI Risk Score</th>
+                                        <th>Risk Tier</th>
+                                        <th>Outcome</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="report-table-tbody">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        document.getElementById('report-timestamp').textContent = new Date().toLocaleString();
+
+        const txs = DB_STORE.getTransactions();
+        const frauds = DB_STORE.getFraudRecords();
+        const customers = DB_STORE.getCustomers();
+        const alerts = DB_STORE.getAlerts();
+
+        // Calculate KPI summaries
+        const totalVol = txs.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+        const preventedVol = txs.filter(t => t.transaction_status === 'FLAGGED')
+                                .reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0);
+
+        const verifiedCustomers = customers.filter(c => c.kyc_status === 'VERIFIED').length;
+        const kycRate = customers.length ? Math.round((verifiedCustomers / customers.length) * 100) : 0;
+
+        document.getElementById('rep-total-volume').textContent = UI.formatCurrency(totalVol);
+        document.getElementById('rep-prevented-val').textContent = UI.formatCurrency(preventedVol);
+        document.getElementById('rep-kyc-rate').textContent = `${kycRate}%`;
+        document.getElementById('rep-alerts-total').textContent = alerts.length;
+
+        // Populate Table
+        const tbody = document.getElementById('report-table-tbody');
+        tbody.innerHTML = txs.map(t => {
+            const f = frauds.find(item => item.transaction_id === t.transaction_id) || {
+                fraud_score: 5.0,
+                risk_level: 'LOW'
+            };
+
+            return `
+                <tr>
+                    <td style="font-weight: 700;">#${t.transaction_id}</td>
+                    <td style="font-family: monospace;">${t.account_number}</td>
+                    <td>${t.customer_name}</td>
+                    <td><span class="badge badge-blue">${t.transaction_type}</span></td>
+                    <td style="font-weight: 700;">${UI.formatCurrency(t.amount)}</td>
+                    <td>${t.location}</td>
+                    <td style="font-weight: 800; color: ${f.risk_level === 'HIGH' ? '#dc2626' : (f.risk_level === 'MEDIUM' ? '#d97706' : '#16a34a')};">
+                        ${f.fraud_score} / 100
+                    </td>
+                    <td>${UI.formatRiskBadge(f.risk_level)}</td>
+                    <td>
+                        ${t.transaction_status === 'FLAGGED' ? '<span class="badge badge-high">HELD / FLAGGED</span>' : 
+                         (t.transaction_status === 'PENDING' ? '<span class="badge badge-medium">PENDING</span>' : '<span class="badge badge-low">CLEARED</span>')}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Export CSV Simulation
+        function exportCSV() {
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Transaction_ID,Account_Number,Customer_Name,Type,Amount,Location,Status,Date\n";
+
+            txs.forEach(t => {
+                csvContent += `${t.transaction_id},${t.account_number},"${t.customer_name}",${t.transaction_type},${t.amount},"${t.location}",${t.transaction_status},${t.transaction_date}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Apex_Financial_Audit_Report_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            UI.showToast('Audit CSV report downloaded!', 'success');
+        }
+    </script>
+</body>
+</html>

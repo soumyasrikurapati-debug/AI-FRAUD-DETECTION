@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Apex Banking Sentinel</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/components.css">
+    <!-- Chart.js CDN for data visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar">
+            <div class="sidebar-header">
+                <div class="logo-badge">🛡️</div>
+                <div>
+                    <h2>Apex Sentinel</h2>
+                    <p>AI Fraud Engine</p>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-title">Core Modules</div>
+                <a href="dashboard.html" class="nav-link active">
+                    <span class="nav-icon">📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="customers.html" class="nav-link">
+                    <span class="nav-icon">👥</span>
+                    <span>Customers</span>
+                </a>
+                <a href="accounts.html" class="nav-link">
+                    <span class="nav-icon">💳</span>
+                    <span>Bank Accounts</span>
+                </a>
+                <a href="transactions.html" class="nav-link">
+                    <span class="nav-icon">💸</span>
+                    <span>Transactions</span>
+                </a>
+
+                <div class="nav-section-title">AI & Security</div>
+                <a href="fraud-detection.html" class="nav-link">
+                    <span class="nav-icon">🔍</span>
+                    <span>Fraud Detection</span>
+                </a>
+                <a href="alerts.html" class="nav-link">
+                    <span class="nav-icon">🚨</span>
+                    <span>Security Alerts</span>
+                </a>
+                <a href="ai-models.html" class="nav-link">
+                    <span class="nav-icon">🤖</span>
+                    <span>AI Model Metrics</span>
+                </a>
+
+                <div class="nav-section-title">Management</div>
+                <a href="branches.html" class="nav-link">
+                    <span class="nav-icon">🏢</span>
+                    <span>Branches</span>
+                </a>
+                <a href="reports.html" class="nav-link">
+                    <span class="nav-icon">📑</span>
+                    <span>Reports & Analytics</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile-badge">
+                    <div class="user-info">
+                        <div class="name" id="user-display-name">Admin User</div>
+                        <div class="role" id="user-display-role">Super Admin</div>
+                    </div>
+                    <button class="logout-btn" title="Sign Out" onclick="DB_STORE.logout()">🚪</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Top Navbar -->
+            <header class="top-navbar">
+                <div class="page-title">
+                    <h1>Executive Dashboard</h1>
+                    <p>Live financial transaction monitoring & AI fraud detection metrics</p>
+                </div>
+                <div class="navbar-actions">
+                    <span class="live-indicator">
+                        <span class="pulse-dot"></span> AI Sentinel Active
+                    </span>
+                    <a href="transactions.html?action=new" class="btn btn-primary btn-sm">
+                        + Process Transaction
+                    </a>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div class="content-container">
+                <!-- KPI Stat Cards -->
+                <div class="grid-4">
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">Total Transactions</div>
+                            <div class="stat-value" id="stat-total-txs">0</div>
+                            <div class="stat-sub" id="stat-total-vol">Vol: ₹0</div>
+                        </div>
+                        <div class="stat-icon blue">💳</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">Suspicious Flagged</div>
+                            <div class="stat-value" id="stat-suspicious-count" style="color: #dc2626;">0</div>
+                            <div class="stat-sub">High & Medium Risk</div>
+                        </div>
+                        <div class="stat-icon red">⚠️</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">Active Fraud Alerts</div>
+                            <div class="stat-value" id="stat-active-alerts" style="color: #d97706;">0</div>
+                            <div class="stat-sub">Requires Analyst Review</div>
+                        </div>
+                        <div class="stat-icon amber">🚨</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-info">
+                            <div class="stat-label">AI Engine Accuracy</div>
+                            <div class="stat-value" style="color: #16a34a;">96.5%</div>
+                            <div class="stat-sub">Multi-Rule Sentinel v2.1</div>
+                        </div>
+                        <div class="stat-icon green">🤖</div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="grid-2">
+                    <!-- Transaction Activity Bar Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Transaction Volume by Type (₹ Lakhs)</h3>
+                            <span class="badge badge-blue">Real-Time Data</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="txVolumeChart" height="180"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Risk Level Distribution Donut Chart -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>AI Risk Distribution</h3>
+                            <span class="badge badge-gray">All Transactions</span>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="riskDonutChart" height="180"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tables: Recent Transactions & Alerts -->
+                <div class="grid-2-equal">
+                    <!-- Recent Transactions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Recent Transactions</h3>
+                            <a href="transactions.html" class="btn btn-outline btn-sm">View All →</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Account / Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions-tbody">
+                                    <!-- Populated via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Critical Fraud Alerts -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Urgent Security Alerts</h3>
+                            <a href="alerts.html" class="btn btn-outline btn-sm">Manage Alerts →</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Alert Type</th>
+                                        <th>Account</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-alerts-tbody">
+                                    <!-- Populated via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="static/js/data-store.js"></script>
+    <script src="static/js/api.js"></script>
+    <script>
+        // Check current authenticated user
+        const currentUser = DB_STORE.getCurrentUser();
+        if (currentUser) {
+            document.getElementById('user-display-name').textContent = currentUser.user_name;
+            document.getElementById('user-display-role').textContent = currentUser.role.replace('_', ' ');
+        }
+
+        // Load stats
+        const stats = DB_STORE.getDashboardStats();
+        document.getElementById('stat-total-txs').textContent = stats.totalTransactions;
+        document.getElementById('stat-total-vol').textContent = 'Vol: ' + UI.formatCurrency(stats.totalVolume);
+        document.getElementById('stat-suspicious-count').textContent = stats.suspiciousCount;
+        document.getElementById('stat-active-alerts').textContent = stats.activeAlerts;
+
+        // Populate Recent Transactions Table
+        const txTbody = document.getElementById('recent-transactions-tbody');
+        txTbody.innerHTML = stats.recentTransactions.map(t => `
+            <tr>
+                <td>#${t.transaction_id}</td>
+                <td>
+                    <div style="font-weight: 600;">${t.customer_name}</div>
+                    <div style="font-size: 0.74rem; color: #64748b;">${t.account_number}</div>
+                </td>
+                <td style="font-weight: 700; color: #0a192f;">${UI.formatCurrency(t.amount)}</td>
+                <td>
+                    ${t.transaction_status === 'FLAGGED' ? '<span class="badge badge-high">Flagged</span>' : 
+                     (t.transaction_status === 'PENDING' ? '<span class="badge badge-medium">Pending</span>' : '<span class="badge badge-low">Success</span>')}
+                </td>
+            </tr>
+        `).join('');
+
+        // Populate Recent Alerts Table
+        const alertTbody = document.getElementById('recent-alerts-tbody');
+        alertTbody.innerHTML = stats.recentAlerts.map(a => `
+            <tr>
+                <td>
+                    <div style="font-weight: 600; color: #dc2626;">${a.alert_type.replace(/_/g, ' ')}</div>
+                    <div style="font-size: 0.72rem; color: #64748b;">${a.alert_time}</div>
+                </td>
+                <td>${a.account_number}</td>
+                <td>
+                    ${a.alert_status === 'NEW' ? '<span class="badge badge-high">NEW</span>' : 
+                     (a.alert_status === 'UNDER_REVIEW' ? '<span class="badge badge-medium">REVIEWING</span>' : '<span class="badge badge-low">RESOLVED</span>')}
+                </td>
+                <td>
+                    <a href="alerts.html" class="btn btn-outline btn-sm">Triage</a>
+                </td>
+            </tr>
+        `).join('');
+
+        // Render Volume Chart
+        const txs = DB_STORE.getTransactions();
+        const depositVol = txs.filter(t => t.transaction_type === 'DEPOSIT').reduce((acc, t) => acc + t.amount, 0) / 100000;
+        const withdrawalVol = txs.filter(t => t.transaction_type === 'WITHDRAWAL').reduce((acc, t) => acc + t.amount, 0) / 100000;
+        const transferVol = txs.filter(t => t.transaction_type === 'TRANSFER').reduce((acc, t) => acc + t.amount, 0) / 100000;
+
+        new Chart(document.getElementById('txVolumeChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Deposits', 'Withdrawals', 'Transfers'],
+                datasets: [{
+                    label: 'Volume (₹ in Lakhs)',
+                    data: [depositVol.toFixed(2), withdrawalVol.toFixed(2), transferVol.toFixed(2)],
+                    backgroundColor: ['#2563eb', '#0284c7', '#38bdf8'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Render Risk Donut Chart
+        new Chart(document.getElementById('riskDonutChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Low Risk', 'Medium Risk', 'High Risk'],
+                datasets: [{
+                    data: [stats.riskBreakdown.low, stats.riskBreakdown.medium, stats.riskBreakdown.high],
+                    backgroundColor: ['#16a34a', '#d97706', '#dc2626'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                },
+                cutout: '65%'
+            }
+        });
+    </script>
+</body>
+</html>
